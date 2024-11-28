@@ -1,104 +1,69 @@
+import { useEffect, useState } from 'react'
+
 import Banner from '../../components/Banner'
 import ProductsList from '../../components/ProductsList'
-import Game from '../../models/Game'
 
 import resident from '../../assets/images/resident.png'
 import diablo from '../../assets/images/diablo.png'
 import zelda from '../../assets/images/zelda.png'
 import starWars from '../../assets/images/star_wars.png'
 
-const promocoes: Game[] = [
-  {
-    id: 1,
-    categoria: 'Acao',
-    descricao:
-      'Resident Evil 4 , conhecido no Japao como Biohazard 4, é um jogo eletronico de survival horror...',
-    title: 'Resident Evil 4',
-    system: 'Windows',
-    infos: ['10 %', 'R$ 250,00'],
-    image: resident
-  },
-  {
-    id: 2,
-    categoria: 'Acao',
-    descricao:
-      'Resident Evil 4 , conhecido no Japao como Biohazard 4, é um jogo eletronico de survival horror...',
-    title: 'Resident Evil 4',
-    system: 'PS5',
-    infos: ['5%', 'R$ 290,00'],
-    image: resident
-  },
-  {
-    id: 3,
-    categoria: 'Acao',
-    descricao:
-      'Resident Evil 4 , conhecido no Japao como Biohazard 4, é um jogo eletronico de survival horror...',
-    title: 'Resident Evil 4',
-    system: 'Windows',
-    infos: ['10 %', 'R$ 250,00'],
-    image: resident
-  },
-  {
-    id: 4,
-    categoria: 'Acao',
-    descricao:
-      'Resident Evil 4 , conhecido no Japao como Biohazard 4, é um jogo eletronico de survival horror...',
-    title: 'Resident Evil 4',
-    system: 'Windows',
-    infos: ['10 %', 'R$ 250,00'],
-    image: resident
-  }
-]
+import { useGetOnSaleQuery, useGetSoonQuery } from '../../services/api'
 
-const emBreve: Game[] = [
-  {
-    id: 5,
-    categoria: 'RPG',
-    descricao:
-      'Diablo IV é um RPG de acao  em desenvolvimento pela Blizzard Entertaiment.',
-    title: 'Diablo 4',
-    system: 'Windows',
-    infos: ['17/05'],
-    image: diablo
-  },
-  {
-    id: 6,
-    categoria: 'RPG',
-    descricao:
-      'Diablo IV é um RPG de acao  em desenvolvimento pela Blizzard Entertaiment.',
-    title: 'Zelda TOK',
-    system: 'Nintendo Switch',
-    infos: ['17/05'],
-    image: zelda
-  },
-  {
-    id: 7,
-    categoria: 'RPG',
-    descricao:
-      'Diablo IV é um RPG de acao  em desenvolvimento pela Blizzard Entertaiment.',
-    title: 'Star Wars Survivor',
-    system: 'Windows',
-    infos: ['17/05'],
-    image: starWars
-  },
-  {
-    id: 8,
-    categoria: 'RPG',
-    descricao:
-      'Resident Evil 4 , conhecido no Japao como Biohazard 4, é um jogo eletronico de survival horror...',
-    title: 'Resident Evil 4',
-    system: 'Nintendo Switch',
-    infos: ['17/05'],
-    image: resident
-  }
-]
+export interface GalleryItem {
+  type: 'image' | 'video'
+  url: string
+}
 
-const Home = () => (
-  <>
-    <Banner />
-    <ProductsList games={promocoes} title="Promocoes" background="gray" />
-    <ProductsList games={emBreve} title="Em Breve" background="black" />
-  </>
-)
+export type Game = {
+  id: number
+  name: string
+  description: string
+  release_date?: string
+  prices: {
+    discount?: number
+    old?: number
+    current?: number
+  }
+  details: {
+    category: string
+    system: string
+    developer: string
+    publisher: string
+    languages: string[]
+  }
+  media: {
+    thumbnail: string
+    cover: string
+    gallery: GalleryItem[]
+  }
+}
+
+const Home = () => {
+  const { data: onSaleGames } = useGetOnSaleQuery()
+  const { data: soonGames } = useGetSoonQuery()
+
+  if (onSaleGames && soonGames) {
+    return (
+      <>
+        <Banner />
+        <ProductsList
+          games={onSaleGames}
+          title="Promocoes"
+          background="gray"
+          id="on-sale"
+        />
+        <ProductsList
+          games={soonGames}
+          title="Em Breve"
+          background="black"
+          id="coming-soon"
+        />
+      </>
+    )
+  }
+
+  return <h4>Carregando...</h4>
+}
 
 export default Home
